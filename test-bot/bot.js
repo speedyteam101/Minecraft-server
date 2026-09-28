@@ -20,6 +20,7 @@ const bot = mineflayer.createBot({
 
 const chat = [];
 let outOfBreath = 0;
+let pigsKilled = 0;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 bot.on('messagestr', (msg, position) => {
@@ -33,6 +34,7 @@ bot.on('messagestr', (msg, position) => {
 bot.on('kicked', (reason) => fail('kicked: ' + JSON.stringify(reason)));
 bot.on('error', (err) => fail(err));
 bot.on('death', () => console.log('[bot] died (respawning)'));
+bot.on('entityDead', (e) => { if (e.name === 'pig') pigsKilled++; });
 
 function fail(why) {
   console.error('TEST FAILED:', why);
@@ -54,7 +56,7 @@ async function cmd(command, wait = 600) {
 }
 
 async function lookAtNearestDemon() {
-  const demon = bot.nearestEntity((e) => e.type === 'mob' || e.type === 'hostile');
+  const demon = bot.nearestEntity((e) => e.type === 'mob' || e.type === 'hostile' || e.type === 'animal');
   if (demon) await bot.lookAt(demon.position.offset(0, 1.2, 0), true);
   return demon;
 }
@@ -84,7 +86,8 @@ async function runStyle(style, forms, swapHands) {
   console.log(`[bot] style ${style} (${forms} forms)`);
   await cmd(`slayer style ${style}`);
   for (let i = 0; i < forms; i++) {
-    await cmd('slayer summon lesser', 700);
+    // Slayers fight demons; demon players can't hurt demons, so they get a pig to hit instead.
+    await cmd(swapHands ? 'summon minecraft:pig ~ ~ ~3 {NoAI:1b}' : 'slayer summon lesser', 700);
     await useForm(swapHands);
     await sleep(1200);
     await nextForm(swapHands);
@@ -110,6 +113,8 @@ bot.once('spawn', async () => {
     if (!opped) fail('bot was never opped');
 
     await cmd('gamerule doDaylightCycle false');
+    await cmd('gamerule doWeatherCycle false');
+    await cmd('weather clear');
     await cmd('time set midnight');
     await cmd('effect give TestSlayer minecraft:resistance 100000 4 true');
     await cmd('effect give TestSlayer minecraft:saturation 100000 1 true');
@@ -128,15 +133,19 @@ bot.once('spawn', async () => {
     console.log('[bot] merit after breathing styles:', afterHuman);
     if (!(afterHuman > start)) fail('no merit gained: techniques did not kill any demons');
 
+    await cmd('kill @e[type=!player]', 1000);
     await cmd('slayer demon TestSlayer', 1000);
     for (const [style, forms] of Object.entries(DEMON_ARTS)) await runStyle(style, forms, true);
     await cmd('slayer human TestSlayer', 1000);
+    console.log('[bot] pigs killed by Blood Demon Arts:', pigsKilled);
+    if (pigsKilled === 0) fail('Blood Demon Arts never hit anything');
 
     // Sunlight: a demon standing in the open at noon should burn away.
     await cmd('kill @e[type=!player]', 1000);
     await cmd('time set noon');
     await cmd('slayer summon lesser', 7000);
-    const survivors = Object.values(bot.entities).filter((e) => e.name === 'zombie').length;
+    const survivors = Object.values(bot.entities)
+      .filter((e) => e.name === 'zombie' && e.position.distanceTo(bot.entity.position) < 10).length;
     console.log('[bot] zombies left after 7s of sunlight:', survivors);
     if (survivors > 0) fail('demon did not burn in sunlight');
     await cmd('time set midnight');
