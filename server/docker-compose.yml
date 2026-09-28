@@ -1,0 +1,22 @@
+# Runs the server in Docker with the itzg/minecraft-server image.
+# Build the plugin first and copy it into ./plugins (see README), then:
+#   EULA=TRUE docker compose up -d
+services:
+  minecraft:
+    image: itzg/minecraft-server
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "${EULA:-FALSE}"
+      TYPE: PAPER
+      VERSION: "1.20.1"
+      MEMORY: 2G
+      DIFFICULTY: hard
+      MOTD: "Demon Slayer | Master your breathing. Slay demons."
+      ONLINE_MODE: "${ONLINE_MODE:-TRUE}"
+    volumes:
+      - ./data:/data
+      - ./plugins:/plugins:ro
+    stdin_open: true
+    tty: true
+    restart: unless-stopped

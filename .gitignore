@@ -1,0 +1,7 @@
+plugin/target/
+server/*
+!server/start.sh
+!server/start.bat
+!server/server.properties
+!server/docker-compose.yml
+test-bot/node_modules/

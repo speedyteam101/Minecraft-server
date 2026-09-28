@@ -1,0 +1,12 @@
+{
+  "name": "demon-slayer-test-bot",
+  "private": true,
+  "description": "Joins a local test server and exercises every breathing form, Blood Demon Art and demon type.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "node bot.js"
+  },
+  "dependencies": {
+    "mineflayer": "^4.0.0"
+  }
+}

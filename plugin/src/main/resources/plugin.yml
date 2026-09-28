@@ -1,0 +1,14 @@
+name: DemonSlayer
+version: '${project.version}'
+main: com.speedyteam101.demonslayer.DemonSlayerPlugin
+api-version: '1.20'
+description: Breathing styles, Nichirin blades, demons that burn in sunlight and the Twelve Kizuki.
+commands:
+  slayer:
+    description: Demon Slayer commands.
+    usage: /slayer help
+    aliases: [ds, demonslayer]
+permissions:
+  demonslayer.admin:
+    description: Give items, summon demons, turn players into demons and change merit.
+    default: op

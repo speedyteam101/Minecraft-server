@@ -1,0 +1,17 @@
+demons:
+  # Chance that a naturally spawning zombie or husk in the Overworld becomes a demon.
+  natural-spawn-chance: 0.35
+  # Demons (mobs and demon players) burn and take heavy damage in direct sunlight.
+  sunlight-burns: true
+  # Damage multiplier for hits that are not from a Nichirin blade or a breathing technique.
+  # Demons can't be killed without a Nichirin blade or sunlight.
+  non-nichirin-damage-multiplier: 0.35
+
+boss-events:
+  # At night your Kasugai Crow may warn you that one of the Twelve Kizuki is coming.
+  enabled: true
+  # Chance per player per minute (at night, Overworld, rank Mizunoe or higher).
+  chance-per-minute: 0.04
+
+# Give new players a Demon Slayer uniform and a starter Nichirin blade on their first join.
+starter-kit: true
