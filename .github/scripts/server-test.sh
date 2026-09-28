@@ -38,13 +38,25 @@ wait_for() {
 wait_for 'Done (' 600
 grep 'Demon Slayer ready' server.log || { echo "Plugin did not enable"; cat server.log; exit 1; }
 
-echo "--- Summoning every demon type from the console ---"
+echo "--- Summoning every demon type from the console (at night, so sunlight doesn't kill them) ---"
+echo "gamerule doDaylightCycle false" >&3
+echo "time set midnight" >&3
+sleep 1
 for t in lesser swamp temari drum hand rui enmu akaza doma kokushibo muzan; do
     echo "slayer summon $t" >&3
 done
 sleep 10
+if grep -q 'has been slain' server.log; then
+    echo "A boss died before /kill: something else is killing demons."
+    grep 'has been slain' server.log
+    exit 1
+fi
 echo "kill @e[type=!player]" >&3
-sleep 2
+sleep 3
+for boss in 'Lower Moon Five Rui' 'Lower Moon One Enmu' 'Upper Moon Three Akaza' 'Upper Moon Two Doma' 'Upper Moon One Kokushibo' 'Demon King Muzan Kibutsuji'; do
+    grep -q "$boss has been slain" server.log || { echo "/kill did not kill $boss"; tail -n 40 server.log; exit 1; }
+done
+echo "All bosses were summoned and could be removed with /kill."
 
 echo "--- Running the test bot ---"
 (cd ../test-bot && node bot.js) &

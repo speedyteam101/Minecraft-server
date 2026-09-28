@@ -25,6 +25,8 @@ import java.util.UUID;
 public final class Combat implements Listener {
     private static final long NICHIRIN_MARK_MS = 5000;
     private static final Fx REGROW = Fx.dust(Color.fromRGB(120, 0, 0), 1.4f);
+    /** Damage causes demons can't shrug off: the void, /kill and the world border (names differ across versions). */
+    private static final java.util.Set<String> ALWAYS_LETHAL = java.util.Set.of("VOID", "KILL", "SUICIDE", "WORLD_BORDER");
 
     private final DemonSlayerPlugin plugin;
     private final Map<UUID, Long> nichirinMarks = new HashMap<>();
@@ -154,7 +156,7 @@ public final class Combat implements Listener {
                 return;
             }
         }
-        if (bypass) {
+        if (bypass || ALWAYS_LETHAL.contains(e.getCause().name())) {
             return;
         }
 

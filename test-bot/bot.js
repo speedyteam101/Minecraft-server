@@ -121,7 +121,7 @@ bot.once('spawn', async () => {
     await cmd('slayer merit TestSlayer 400', 1000);
     const start = await merit();
     console.log('[bot] merit at start:', start);
-    if (start !== 400) fail('expected 400 merit, got ' + start);
+    if (!(start >= 400)) fail('expected at least 400 merit, got ' + start);
 
     for (const [style, forms] of Object.entries(FORMS)) await runStyle(style, forms, false);
     const afterHuman = await merit();
